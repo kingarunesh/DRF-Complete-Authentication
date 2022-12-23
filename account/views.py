@@ -3,19 +3,23 @@ from rest_framework.views import APIView
 from rest_framework import status
 from account.serializers import UserRegistrationSerializer, LoginSerializer
 from django.contrib.auth import authenticate
+from account.renderers import UserRenderer
 
 
 class UserRegisterView(APIView):
+    renderer_classes = [UserRenderer]
+
     def post(self, request, format=None):
 
         #!  send data
         serializer = UserRegistrationSerializer(data=request.data)
 
         #!  check valid data
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             return Response({"message": "Register successfull"}, status=status.HTTP_201_CREATED)
         
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
