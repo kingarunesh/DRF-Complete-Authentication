@@ -164,3 +164,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # !     Custom User Model
 AUTH_USER_MODEL = "account.User"
+
+
+
+#!  Token Time Set
+PASSWORD_RESET_TIMEOUT = 60
