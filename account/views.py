@@ -1,10 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from account.serializers import UserRegistrationSerializer, LoginSerializer
+from account.serializers import UserRegistrationSerializer, LoginSerializer, ProfileSerializer
 from django.contrib.auth import authenticate
 from account.renderers import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 
 
 def get_tokens_for_user(user):
@@ -15,6 +16,7 @@ def get_tokens_for_user(user):
     }
 
 
+#!  register
 class UserRegisterView(APIView):
     renderer_classes = [UserRenderer]
 
@@ -33,6 +35,8 @@ class UserRegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+
+#!  login
 class LoginView(APIView):
     def post(self, request, format=None):
         serializer = LoginSerializer(data=request.data)
@@ -50,3 +54,14 @@ class LoginView(APIView):
                 return Response({"error": {"non_field_errors": ["Email or Password not found"]}}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+#!  profile
+class ProfileView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        serializer = ProfileSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
