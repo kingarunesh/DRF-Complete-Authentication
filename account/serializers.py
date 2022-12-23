@@ -4,6 +4,7 @@ from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeErr
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
+from account.utils import Util
 
 
 
@@ -88,9 +89,19 @@ class SendPasswordResetSerializer(serializers.Serializer):
             token = PasswordResetTokenGenerator().make_token(user)
             print("User Token : ", token)
 
-            # link = f"http://127.0.0.1:8000/api/user/reset/{uid}/{token}"
-            link = "http://127.0.0.1:8000/api/user/reset/"+uid+"/"+token
+            link = f"http://127.0.0.1:8000/api/user/reset/{uid}/{token}/"
+            # link = "http://127.0.0.1:8000/api/user/reset/"+uid+"/"+token
             print(link)
+
+            body = "Click the following link to reset you password " + link
+
+            data = {
+                "subject": "Reset Your Password",
+                "body": body,
+                "to_email": user.email
+            }
+
+            Util.send_email(data)
 
             return attrs
         else:
